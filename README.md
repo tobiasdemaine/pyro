@@ -4,7 +4,7 @@ An Electron based Thermocouple/Pyrometer App for measuring kiln temperatures des
 
 ## Overview
 
-This React/Electron app was developed to use a Raspberry Pi with a 320 X 240 touch screen & [BrightWin Intelligent Thermocouple PT100 Temperature Transmitter](https://www.brightwintech.com/product/intelligent-thermocouple-pt100-temperature-transmitter/) via its uarl/serial to USB connector as a standalone device to log and transmit temperature data to a React Native App via wifi and websockets. It can work as a wifi access point or join existing wifi networks.
+This React/Electron app was developed to use a Raspberry Pi with a 320 X 240 touch screen & [BrightWin Intelligent Thermocouple PT100 Temperature Transmitter](https://www.brightwintech.com/product/intelligent-thermocouple-pt100-temperature-transmitter/) via its uart/serial to USB connector as a standalone device to log and transmit temperature data to a React Native App via wifi and websockets. It can work as a wifi access point or join existing wifi networks.
 
 ## Features
 
