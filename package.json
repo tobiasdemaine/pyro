@@ -2,7 +2,7 @@
   "name": "pyro",
   "productName": "pyro",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Standalone pyro with wifi for Raspberry Pi",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -51,6 +51,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.1",
+    "rpmbuild": "^0.0.23",
     "serialport": "^13.0.0",
     "ws": "^8.18.1"
   }

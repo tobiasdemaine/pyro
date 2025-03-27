@@ -104,7 +104,15 @@ export const Main = () => {
         </div>
         <div>
           <LineChart width={450} height={250}>
-            <XAxis dataKey="time" type="number" domain={["auto", "auto"]} />
+            <XAxis
+              dataKey="time"
+              type="number"
+              domain={["auto", "auto"]}
+              tickFormatter={(unixTimestamp) => {
+                const date = new Date(unixTimestamp);
+                return date.toLocaleTimeString();
+              }}
+            />
             <YAxis />
             <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
             <Line
@@ -112,12 +120,14 @@ export const Main = () => {
               data={temp1}
               dataKey="temp"
               stroke="#8884d8"
+              dot={false}
             />
             <Line
               type="monotone"
               data={temp2}
               dataKey="temp"
               stroke="#82ca9d"
+              dot={false}
             />
           </LineChart>
         </div>
