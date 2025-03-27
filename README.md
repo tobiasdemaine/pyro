@@ -30,4 +30,4 @@ npm run package
 ./scripts/auto_load.sh
 ```
 
-Now reboot machine and
+Now reboot machine
