@@ -26,7 +26,9 @@ export const Config = ({
       <div
         style={{
           height: "100%",
-          width: "100%",
+          maxWidth: 480,
+          maxHeight: 320,
+          width: "vw",
           background: "#FFF",
           margin: "auto",
         }}
