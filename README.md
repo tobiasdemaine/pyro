@@ -1,6 +1,6 @@
 # Pyro
 
-An Electron based Thermocouple/Pyrometer App for measuring kiln temperatures desing to be used with a Raspberry Pi with touch screen.
+An Electron based Thermocouple/Pyrometer App for measuring kiln temperatures for use with a Raspberry Pi with touch screen.
 
 ## Overview
 
