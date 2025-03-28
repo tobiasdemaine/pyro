@@ -110,7 +110,7 @@ export const Main = () => {
             Network Setup
           </div>
         </div>
-        <div>
+        <div style={{ marginTop: 20 }}>
           <LineChart width={400} height={200}>
             <XAxis
               dataKey="time"
