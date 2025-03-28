@@ -9,6 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+    "install": "electron-rebuild serialport",
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
