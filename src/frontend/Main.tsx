@@ -68,7 +68,7 @@ export const Main = () => {
   return (
     <>
       <div
-        style={{ height: 320, width: 480, background: "#FFF", margin: "auto" }}
+        style={{ height: 300, width: 430, background: "#FFF", margin: "auto" }}
       >
         <div>
           <div
