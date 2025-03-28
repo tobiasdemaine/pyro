@@ -24,7 +24,12 @@ export const Config = ({
   return (
     <>
       <div
-        style={{ height: 320, width: 480, background: "#FFF", margin: "auto" }}
+        style={{
+          height: "100%",
+          width: "100%",
+          background: "#FFF",
+          margin: "auto",
+        }}
       >
         <div
           onClick={() => {
