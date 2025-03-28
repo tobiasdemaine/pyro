@@ -68,7 +68,13 @@ export const Main = () => {
   return (
     <>
       <div
-        style={{ height: 300, width: 430, background: "#FFF", margin: "auto" }}
+        style={{
+          height: 320,
+          width: 480,
+          background: "#FFF",
+          margin: "auto",
+          overflow: "hidden",
+        }}
       >
         <div>
           <div
@@ -103,7 +109,7 @@ export const Main = () => {
           </div>
         </div>
         <div>
-          <LineChart width={450} height={250}>
+          <LineChart width={400} height={200}>
             <XAxis
               dataKey="time"
               type="number"
