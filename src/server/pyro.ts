@@ -6,6 +6,9 @@ class ThermocoupleDevice extends EventEmitter {
   private isMonitoring = false;
   private dataBuffer: Buffer = Buffer.alloc(0);
   temp = 0;
+  private lastDataTime: number = Date.now();
+  private readonly STALL_TIMEOUT = 10000; // 10 seconds timeout
+  private monitorInterval: NodeJS.Timeout | null = null;
 
   constructor(portPath: string) {
     super();
@@ -29,17 +32,15 @@ class ThermocoupleDevice extends EventEmitter {
   private setupListeners(): void {
     this.port.on("open", () => {
       console.log("Serial port opened");
+      this.lastDataTime = Date.now();
     });
 
     this.port.on("data", (data: Buffer) => {
-      // console.log("Raw data received:", data.toString("hex"));
+      this.lastDataTime = Date.now();
       this.dataBuffer = Buffer.concat([this.dataBuffer, data]);
-      //  console.log("Current dataBuffer:", this.dataBuffer.toString("hex"));
 
-      // Process buffer one packet at a time if monitoring
       if (this.isMonitoring) {
         while (this.dataBuffer.length >= 8) {
-          // Check for valid packet start and end
           if (
             this.dataBuffer[0] === 0xaa &&
             this.dataBuffer.length >= 8 &&
@@ -47,14 +48,13 @@ class ThermocoupleDevice extends EventEmitter {
           ) {
             const packet = this.dataBuffer.slice(0, 8);
             this.parseTemperature(packet);
-            this.dataBuffer = this.dataBuffer.slice(8); // Remove processed packet
+            this.dataBuffer = this.dataBuffer.slice(8);
           } else {
-            // If no valid start, discard until next 0xaa
             const nextStart = this.dataBuffer.indexOf(0xaa, 1);
             if (nextStart !== -1) {
               this.dataBuffer = this.dataBuffer.slice(nextStart);
             } else {
-              this.dataBuffer = Buffer.alloc(0); // Clear if no valid data
+              this.dataBuffer = Buffer.alloc(0);
               break;
             }
           }
@@ -64,6 +64,7 @@ class ThermocoupleDevice extends EventEmitter {
 
     this.port.on("error", (err: Error) => {
       console.error("Port error:", err.message);
+      this.handleStall();
     });
 
     this.port.on("close", () => {
@@ -124,7 +125,6 @@ class ThermocoupleDevice extends EventEmitter {
           console.log("Full response received:", response.toString("hex"));
           resolve(response);
         } else if (Date.now() - startTime > timeoutMs) {
-          // Log partial data even on timeout, as sniffer showed data with STATUS_TIMEOUT
           console.warn(
             `Timeout after ${timeoutMs}ms, but partial data: ${this.dataBuffer.toString(
               "hex"
@@ -134,7 +134,6 @@ class ThermocoupleDevice extends EventEmitter {
             this.dataBuffer.length >= expectedLength &&
             this.dataBuffer[0] === 0xaa
           ) {
-            // Accept partial data if it looks valid, per sniffer behavior
             const response = this.dataBuffer.slice(0, expectedLength);
             this.dataBuffer = this.dataBuffer.slice(expectedLength);
             resolve(response);
@@ -209,6 +208,19 @@ class ThermocoupleDevice extends EventEmitter {
       this.isMonitoring = true;
       await this.writeCommand([0x04, 0x0d]);
       console.log("Monitoring started successfully");
+
+      if (this.monitorInterval) {
+        clearInterval(this.monitorInterval);
+      }
+      this.lastDataTime = Date.now();
+      this.monitorInterval = setInterval(() => {
+        if (
+          this.isMonitoring &&
+          Date.now() - this.lastDataTime > this.STALL_TIMEOUT
+        ) {
+          this.handleStall();
+        }
+      }, 1000);
     } catch (err) {
       console.error("Error starting monitoring:", err);
       this.isMonitoring = false;
@@ -220,16 +232,16 @@ class ThermocoupleDevice extends EventEmitter {
     if (buffer.length < 7) {
       throw new Error("Buffer too short; expected at least 7 bytes");
     }
-    const temp1 = buffer[6]; // 0x41 (swap to match observed pattern)
-    const temp2 = buffer[5]; // 0xf3
-    const temp3 = buffer[4]; // 0x39
+    const temp1 = buffer[6];
+    const temp2 = buffer[5];
+    const temp3 = buffer[4];
     const floatBuffer = new ArrayBuffer(4);
     const uint8View = new Uint8Array(floatBuffer);
     const float32View = new Float32Array(floatBuffer);
-    uint8View[0] = 0x00; // MSB padding
-    uint8View[1] = temp3; // 0x39
-    uint8View[2] = temp2; // 0xf3
-    uint8View[3] = temp1; // 0x41
+    uint8View[0] = 0x00;
+    uint8View[1] = temp3;
+    uint8View[2] = temp2;
+    uint8View[3] = temp1;
     return float32View[0];
   }
 
@@ -254,8 +266,31 @@ class ThermocoupleDevice extends EventEmitter {
       }
     }
   }
+
+  private async handleStall(): Promise<void> {
+    console.log("Connection stalled, attempting to restart...");
+    this.isMonitoring = false;
+
+    try {
+      if (this.port.isOpen) {
+        await this.close();
+      }
+
+      await this.open();
+      await this.startMonitoring();
+      console.log("Monitoring restarted successfully");
+    } catch (err) {
+      console.error("Failed to restart monitoring:", err);
+      setTimeout(() => this.handleStall(), 2000);
+    }
+  }
+
   public stopMonitoring(): void {
     this.isMonitoring = false;
+    if (this.monitorInterval) {
+      clearInterval(this.monitorInterval);
+      this.monitorInterval = null;
+    }
     console.log("Stopping monitoring...");
     this.port.close();
   }

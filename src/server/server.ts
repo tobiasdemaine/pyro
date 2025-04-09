@@ -36,7 +36,7 @@ wss.on("connection", (ws) => {
         "networkStatus",
         "checkNetworkMode",
         "networkDevices",
-        "get  Temp",
+        "getTemp",
       ];
 
       if (deviceId === null) {
@@ -126,6 +126,17 @@ wss.on("connection", (ws) => {
           break;
 
         case "getTemp":
+          devices.usb0.on("temperature", () => {
+            ws.send(
+              JSON.stringify({
+                command: "getTemp",
+                data: {
+                  temp1: devices.usb0.temp,
+                  temp2: devices.usb1.temp,
+                },
+              })
+            );
+          });
           response.data = {
             temp1: devices.usb0.temp,
             temp2: devices.usb1.temp,

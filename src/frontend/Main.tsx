@@ -76,6 +76,7 @@ export const Main = () => {
           background: "#FFF",
           margin: "auto",
           overflow: "hidden",
+          //border: "1px solid #000",
         }}
       >
         <div>
@@ -101,14 +102,15 @@ export const Main = () => {
               ? Number(socket2.temperature).toFixed(2)
               : "Connect 2"}
           </div>
-          <div
+          {/* <div
             style={{ ...styles.pyroButton, float: "right" }}
             onClick={() => {
               setNetwork(true);
             }}
           >
-            Network Setup
-          </div>
+            Network
+             Setup
+          </div> */}
         </div>
         <div style={{ marginTop: 20 }}>
           <LineChart width={400} height={200}>
@@ -151,21 +153,25 @@ const styles: {
   pyroButton: {
     borderRadius: 5,
     backgroundColor: "#AAA",
-    color: "#fff",
+    color: "#000",
     flex: 1,
     margin: 5,
     padding: 10,
     textAlign: "center",
     display: "inline-block",
+    fontSize: 30,
+    fontWeight: "bold",
   },
   pyroButtonOn: {
     borderRadius: 5,
     backgroundColor: "#04AA6D",
-    color: "#fff",
+    color: "#000",
     flex: 1,
     margin: 5,
     padding: 10,
     textAlign: "center",
     display: "inline-block",
+    fontSize: 30,
+    fontWeight: "bold",
   },
 };
